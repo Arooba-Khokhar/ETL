@@ -1,0 +1,2 @@
+  DELETE FROM `showheroes-bi.ops_teams.demand_platform_campign`
+  WHERE  __hevo_id like "platform%" AND timestamp = '2022-01-22'
