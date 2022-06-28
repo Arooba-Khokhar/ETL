@@ -1,0 +1,4 @@
+UPDATE `showheroes-bi.ops_teams.demand_adomik_TAM`   
+SET deal_id_name = TRIM(SUBSTR(TRIM( deal_id_name) ,  10))
+
+where platform = 'axb'
