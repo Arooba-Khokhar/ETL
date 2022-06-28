@@ -1,0 +1,3 @@
+CREATE OR REPLACE TABLE `showheroes-bi.datacater_test.v9_03`
+AS 
+(select distinct  * from `showheroes-bi.datacater_test.v9_03`)
