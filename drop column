@@ -1,0 +1,4 @@
+
+
+
+ALTER TABLE `showheroes-bi.ops_teams.Demand_TAM` DROP COLUMN IF EXISTS column_25
