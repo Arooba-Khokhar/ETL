@@ -1,0 +1,161 @@
+from io.hevo.api import Event
+from dateutil import parser
+
+"""
+event: each record streaming through Hevo pipeline is an event
+
+returns:
+- The modified event object.
+- Array of event objects if new events are generated from the incoming event.
+- None if the event is supposed to be dropped from the pipeline.
+
+Read complete documentation at: https://docs.hevodata.com/pipelines/transformations/
+"""
+
+def transform(event):
+    eventName = event.getEventName()
+    properties = event.getProperties()
+    
+################################################################################################
+    """
+    Rename a field
+    """
+    def rename(x,y):
+        if x in properties.keys():
+            properties[y] = properties[x]
+            del properties[x]
+            
+################################################################################################
+    """
+    Casting functions
+    """
+    def cast_to_timestamp(date):
+        if date in properties.keys():
+            try:
+                properties[date] = parser.parse(str(properties[date]))
+            except:
+                properties[date] = None
+
+
+    def cast_to_float(list1):
+        for x in list1:
+            if x in properties.keys():
+            
+                characters_to_clean=['\\', '/', '\"']  # We can add more characters to remove them
+                for y in characters_to_clean:
+                    if y in str(properties[x]):
+                        properties[x]=properties[x].replace(y,'').strip()
+                    
+                if properties[x] == "":
+                    properties[x] = None
+                else:
+                    properties[x] = float(str(properties[x]).strip())
+                
+                
+    def cast_to_int(list2):
+        for x in list2:
+            if x in properties.keys():
+            
+                characters_to_clean=['\\', '/', '\"']  # We can add more characters to remove them
+                for y in characters_to_clean:
+                    if y in str(properties[x]):
+                        properties[x]=properties[x].replace(y,'').strip()
+                    
+                if properties[x] == "":
+                    properties[x] = None
+                elif str(properties[x]).strip()[-2:]=='.0':
+                    properties[x] = int(str(properties[x]).replace('.0','').strip())
+                else:
+                    properties[x] = int(str(properties[x]).strip())
+                    
+    """
+    Replace values
+    """
+    def replace_values(column,old,new):
+        if column in properties.keys():
+            if properties[column] == old:
+                properties[column] = new 
+                
+                
+                
+                
+                
+                
+                """
+                MAIN- TRANSFORMATIONS
+                """
+              ###############################################################################################
+    """
+    Supply_xandr_general_metrics
+    """
+    if eventName == "Supply_xandr_general_metrics_v1":
+        if properties['day'] == "Totals":
+            properties['day']= None
+        if properties['day'] != None:
+            properties['day']= str(properties['day'])+ ' 00:00:00'
+        cast_to_timestamp('day')
+        
+        list_int=['imps','video_completions','video_errors','video_skips','video_starts']
+        cast_to_int(list_int)
+
+        list_float=['ctr','revenue','revenue_per_video_complete','view_rate','video_completion_rate']
+        cast_to_float(list_float)
+
+        
+        
+        event.setPrimaryKeyFields(['day', '__hevo_id'])
+#########################################################################################
+    """
+    Supply_xandr_gps_seller_fill_and_delivery_network_v1
+    """
+    if eventName == "Supply_xandr_seller_fill_and_delivery_network_v1":
+        if 'day' in properties.keys():
+            if properties['day'] == "Totals":
+                properties['day']= None
+            cast_to_timestamp('day')    
+        
+        list1=['imps_kept','imps_resold','bid_sent_no_responses','default_no_responses','defaults','filtered_requests','psas_or_blanks','total_ad_requests','total_ad_responses','video_default_errors','video_player_errors']
+        cast_to_int(list1)
+
+        list2=['seller_revenue']
+        cast_to_float(list2)
+
+        
+        
+        event.setPrimaryKeyFields(['__hevo_id'])
+        
+#########################################################################################
+    """
+    Supply_xandr_gps_seller_fill_and_delivery_network_v1
+    """
+    
+    if eventName == "Supply_xandr_gps_seller_fill_and_delivery_network_v1":
+        list1=['imps_kept','imps_resold','bid_sent_no_responses','default_no_responses','defaults','filtered_requests','psas_or_blanks','total_ad_requests','total_ad_responses','video_default_errors','video_player_errors']
+        cast_to_int(list1)
+
+        list2=['seller_revenue','seller_revenue_seller_currency']
+        cast_to_float(list2)
+
+        
+#########################################################################################
+    """
+    Supply_xandr_gps_video_analytics_v1
+    """
+    
+    if eventName == "Supply_xandr_gps_video_analytics_v1":
+        cast_to_timestamp('day')
+        
+        list1=['imps','imps_viewed','view_measured_imps','25_pcts','50_pcts','75_pcts','ad_requests','ad_responses','completions','errors','skips','starts']
+        cast_to_int(list1)
+
+        list2=['revenue','revenue_buying_currency','revenue_selling_currency']
+        
+        cast_to_float(list2)
+        
+        rename('25_pcts', 'first_q')
+        rename('50_pcts', 'midpoint')
+        rename('75_pcts', 'third_q')
+
+
+#########################################################################################
+    return event
