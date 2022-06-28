@@ -1,0 +1,4 @@
+UPDATE `showheroes-bi`.`ops_teams`.`Demand_adomik_TAM2` a
+SET  a.`booking_country_name` = b.`booking_country`
+FROM `showheroes-bi.ops_teams.xandr_sheet` b
+where (a.`line_item_id_name` = b.`Line_Item_Id_Name`) and a.`platform` = b.`platform`
