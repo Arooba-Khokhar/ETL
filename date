@@ -1,0 +1,12 @@
+
+
+select *  FROM `showheroes-bi.ops_teams.demand_adomik_inventory_test`
+WHERE 
+date= date_add(DATE, INTERVAL -7 day)
+
+and
+date= date_add(DATE, INTERVAL -1 day)
+
+and
+ date= date_add(DATE, INTERVAL -13 day)
+
