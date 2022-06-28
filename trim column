@@ -1,0 +1,16 @@
+
+
+
+SELECT date,  
+ seller_id, 
+ platform	,
+ deal_id_adk	,
+ line_item_id_adk,
+ line_item_id_name	,
+ net_revenue,
+ impressions_resold,
+ revenue_resold,
+
+TRIM(SUBSTR(TRIM( deal_id_name),  10))
+FROM `showheroes-bi.ops_teams.test`   
+WHERE platform = 'axb'
