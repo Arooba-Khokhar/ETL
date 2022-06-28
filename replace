@@ -1,0 +1,7 @@
+
+
+CREATE OR REPLACE TABLE  `showheroes-bi.datacater_test.Demand_tam`
+
+
+AS 
+(select distinct  * from `showheroes-bi.datacater_test.Demand_tam`)
