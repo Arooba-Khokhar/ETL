@@ -1,0 +1,87 @@
+from io.hevo.api import Event
+from datetime import datetime
+from dateutil import parser
+import re
+
+
+
+
+
+
+def transform(event):
+    properties = event.getProperties()
+    try:
+        properties['date'] = parser.parse(str(properties['date']))
+    except:
+        properties['date'] =None
+        
+
+    def cast_to_float(x, properties):
+        if x in properties.keys():
+            
+            characters_to_clean=['\"\"',"rch-Unknown","Open auction","Unknown",'gdx-Open auction',"adf-n/a","gdx-Open auction", "gdx","adf-n/a",'adfna','na','n/a', 'appnexus', 'hb (14447157)', 'hb (14447157)', 'adk-80401', 'om_muchodeporte.com_dis_300x250_m','om_muchodeporte.com_dis_300x250_m in' ,'in', 'bt']  # we can add more characters to remove
+            for y in characters_to_clean:
+                if y in str(properties[x]):
+                    properties[x]=properties[x].replace(y,'').strip()
+                    
+            if str(properties[x]).strip() == "":
+                properties[x] = None
+            else:
+                properties[x] = float(str(properties[x]).strip())
+            if 'E' in str(properties[x]):
+                test=str(properties[x]).split('E')
+                properties[x]=float(test[-2])*(10**int(test[-1]))
+
+
+
+    
+    
+    
+    
+
+    def cast_to_int(x, properties):
+        if x in properties.keys():
+            if properties[x] == "" or "\"\"" in str(properties[x]):
+                properties[x] = None
+            else:  
+                if str(properties[x]).strip()[-2:]=='.0':
+                    properties[x] = int(str(properties[x]).replace('.0','').strip())
+                else:
+                    properties[x] = int(str(properties[x]).strip())
+                    
+
+    """ Filtering file name"""
+    
+    pattern = "([0-9]+-[0-9]+-[0-9]+.csv)_[0-9]+"
+    test_string = properties['__hevo_id'].split('/')
+    result = re.match(r'([0-9]+-[0-9]+-[0-9]+.csv_)', test_string[-1])
+
+
+    
+    if (result):
+        if properties["revenue_resold"]== "gdx-Open auction":
+            properties["revenue_resold"]=None
+        else:
+            cast_to_float('revenue_resold', properties)
+            cast_to_float('net_revenue', properties)
+            cast_to_float('impressions_resold', properties)
+            cast_to_int('viewed_impressions', properties)
+            cast_to_int('view_eligible_impressions', properties)
+            cast_to_int('clicks', properties)
+        
+        
+        if properties['seller_id'] == '8833':
+
+            properties['platform'] = 'Xandr'
+            
+    
+        elif properties['seller_id'] == 'viralize_ver':
+
+            properties['platform'] = 'Verizon'
+                 
+
+                
+        event.setPrimaryKeyFields(['__hevo_id'])
+        return event
+    else: 
+        return None
