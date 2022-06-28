@@ -1,0 +1,6 @@
+
+
+UPDATE `showheroes-bi.datacater_test.adomik_tam`  a
+SET  a.`booking_country_name` = b.`booking_country_name`
+FROM `showheroes-bi.datacater_test.registry_etl_deals` b
+WHERE  a.`deal_id_adk` = b.`external_deal_id`
