@@ -1,0 +1,17 @@
+
+
+select
+distinct
+ a.date,  
+ a.seller_id, 
+ a.platform	,
+ a.deal_id_adk	,
+ a.deal_id_name	,
+ a.line_item_id_adk,
+ a.line_item_id_name	,
+ a.net_revenue,
+ a.impressions_resold,
+ a.revenue_resold	, b.booking_country_name
+
+from `showheroes-bi.datacater_test.demand_adomik_tam` a, `showheroes-bi.datacater_test.registry_test_registry_etl_deals` b
+WHERE  a.`deal_id_name` = b.`name`
