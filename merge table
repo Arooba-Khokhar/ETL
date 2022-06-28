@@ -1,0 +1,5 @@
+select
+
+ a.*, b.booking_country_name
+
+from `showheroes-bi.ops_teams.demand_adomik_deal` a, `showheroes-bi.ops_teams.demand_registry_etl_deals` b
