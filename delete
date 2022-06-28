@@ -1,0 +1,1 @@
+DELETE FROM `showheroes-bi.adops.adomik_data_v1`  WHERE  __datacater_file_name like  'part-000%' 
