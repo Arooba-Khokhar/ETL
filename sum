@@ -1,0 +1,1 @@
+SELECT sum(pmp_revenue_resold) FROM `showheroes-bi.adops.adomik_data` WHERE date = "2022-02-28" 
