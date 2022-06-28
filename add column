@@ -1,0 +1,2 @@
+ALTER TABLE `showheroes-bi.ops_teams.demand_adomik_deal`
+ADD  column booking_country string;
