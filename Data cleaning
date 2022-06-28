@@ -1,0 +1,120 @@
+from io.hevo.api import Event
+from dateutil import parser
+
+def transform(event):
+    eventName = event.getEventName()
+    properties = event.getProperties()
+
+#########################################################################################
+    """
+    Rename a field
+    """
+    def rename(x,y,properties):
+        if x in properties.keys():
+            properties[y] = properties[x]
+            del properties[x]
+    """
+    Replace values
+    """
+    def replace_values(column,old,new, properties):
+        if column in properties.keys():
+            if properties[column] == old:
+                properties[column] = new 
+#########################################################################################
+    """
+    Casting functions
+    """
+    def cast_to_timestamp(date, properties):
+        if date in properties.keys():
+            try:
+                properties[date] = parser.parse(str(properties[date]))
+            except:
+                properties[date]=None
+
+
+    def cast_to_float(list1, properties):
+        for x in list1:
+            if x in properties.keys():
+            
+                characters_to_clean=['\\', '/', '\"']  # We can add more characters to remove them
+                for y in characters_to_clean:
+                    if y in str(properties[x]):
+                        properties[x]=properties[x].replace(y,'').strip()
+                    
+                if properties[x] == "":
+                    properties[x] = None
+                else:
+                    properties[x] = float(str(properties[x]).strip())
+                
+                
+    def cast_to_int(list2, properties):
+        for x in list2:
+            if x in properties.keys():
+            
+                characters_to_clean=['\\', '/', '\"']  # We can add more characters to remove them
+                for y in characters_to_clean:
+                    if y in str(properties[x]):
+                        properties[x]=properties[x].replace(y,'').strip()
+                    
+                if properties[x] == "":
+                    properties[x] = None
+                elif str(properties[x]).strip()[-2:]=='.0':
+                    properties[x] = int(str(properties[x]).replace('.0','').strip())
+                else:
+                    properties[x] = int(str(properties[x]).strip())
+                
+                
+    def fix(A):
+        list=A.split(";")
+        S=[]
+        delete=[]
+    
+        # List of values related to separator
+        for i in range(len(list)):
+            if list[i].count('"')==1:
+                S.append(i)
+            
+        m=len(S)     
+        for i in range(int(m/2)):
+            n=S[2*i+1]
+            for j in range(S[2*i], S[2*i+1]):
+                list[S[2*i]]=list[S[2*i]]+';'+list[j+1]
+                delete.append(j+1)
+        for index in sorted(delete, reverse=True):
+            del list[index]
+        return list
+                
+                
+#########################################################################################
+     #          """
+        #        MAIN- TRANSFORMATIONS
+       #         """
+    merged_column=properties.keys()[0]
+    n=properties.keys()[0].count(';')+1
+    for i in range(n):
+        if properties[merged_column].count(';')==n-1:
+            properties[merged_column.split(';')[i]] = properties[merged_column].split(';')[i]
+        else:
+            merged_column_value=properties[merged_column]
+            
+            
+                
+            newlist=fix(merged_column_value)
+            for i in range(n):
+                if len(newlist)==n:
+                    properties[merged_column.split(';')[i]] = newlist[i]
+            
+            
+    list_to_int= ['impressions_resold','clicks','viewed_impressions','view_eligible_impressions', 'video_complete_count','video_quartile_1_count','video_quartile_2_count','video_quartile_3_count','click_eligible_impressions']
+        
+    cast_to_int(list_to_int, properties)
+    
+    list_to_float=['revenue_resold','net_revenue']
+    cast_to_float(list_to_float,properties)
+    
+    del properties[properties.keys()[0]]
+
+    cast_to_timestamp('date', properties)
+
+#########################################################################################
+    return event
