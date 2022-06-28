@@ -1,0 +1,38 @@
+SELECT
+distinct
+
+  platform,
+  deal_id_adk,
+  deal_id_name,
+  line_item_id_adk,
+  line_item_id_name,
+  seller_id,
+  date,
+  sum (revenue_resold) AS revenue_resold,
+  sum(safe_cast(net_revenue as float64))  AS net_revenue,
+  sum(safe_cast(impressions_resold as float64))  AS impressions_resold
+
+FROM
+  `showheroes-bi.ops_teams.demand_adomik_inventory_`
+WHERE
+  
+    deal_id_adk like 'axb%' or deal_id_adk like 'fwl%' or deal_id_adk like 'dfp%' or deal_id_adk like 'sma%' or
+ deal_id_adk like 'gdx%' or deal_id_adk like 'ver%' or deal_id_adk like 'rch%' or deal_id_adk like 'tpl%' or
+ deal_id_adk like 'sov%' or deal_id_adk like 'obr%' or deal_id_adk like 'pum%' or deal_id_adk like 'url%' or
+  deal_id_adk like 'adf%' or deal_id_adk like 'wzd%' or deal_id_adk like 'ipv%' or platform like 'ebx%' or
+  deal_id_adk like 'onx%' or platform like 'spx%' or platform like 'SHG platform'  or 
+  deal_id_adk like 'ylb%' or deal_id_adk like 'Ver%' or deal_id_adk like 'cal%' 
+
+
+
+
+GROUP BY
+  seller_id,
+  platform,
+  deal_id_adk,
+  deal_id_name,
+  line_item_id_adk,
+  line_item_id_name,
+  date
+ORDER BY
+  revenue_resold DESC
